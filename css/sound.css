@@ -5,6 +5,7 @@
 	margin-bottom: 64px;
 }
 .sound {
+	position: relative;
 	width: 160px;
 	height: 180px;
 	display: flex;
@@ -68,4 +69,59 @@
 .sound .name {
 	color: var(--text);
 	margin: 2px;
+	max-width: 90%;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+/* Remove button on custom sounds */
+.sound .removeSound {
+	position: absolute;
+	top: 8px;
+	right: 8px;
+	width: 28px;
+	height: 28px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: 50%;
+	background-color: var(--tertiary);
+	color: var(--text);
+	cursor: pointer;
+	opacity: 0;
+	transition: opacity 0.15s;
+}
+.sound:hover .removeSound,
+.sound .removeSound:focus-visible {
+	opacity: 1;
+}
+.sound .removeSound:hover {
+	background-color: var(--color);
+	color: var(--on-color);
+}
+/* No hover on touch screens, so keep the button visible */
+@media (hover: none) {
+	.sound .removeSound {
+		opacity: 0.8;
+	}
+}
+
+/* "Add sound" tile */
+.sound.addSound {
+	font: inherit;
+	cursor: pointer;
+}
+.sound.addSound .iconContainer {
+	border: 2px dashed var(--color-disabled);
+	color: var(--text);
+	transition: border-color 0.15s;
+}
+.sound.addSound:hover .iconContainer,
+.sound.addSound:focus-visible .iconContainer {
+	border-color: var(--color);
+}
+.sound.addSound:focus-visible {
+	outline: 2px solid var(--color);
+	outline-offset: -2px;
 }

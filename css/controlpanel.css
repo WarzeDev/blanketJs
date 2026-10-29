@@ -7,6 +7,7 @@
 	justify-content: center;
 	align-items: center;
 	padding: 8px;
+	padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px));
 	box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.3);
 	gap: 16px;
 }
@@ -20,6 +21,7 @@
 
 #playback {
 	background-color: var(--color);
+	color: var(--on-color);
 	border-radius: 50%;
 	padding: 12px;
 	display: flex;
@@ -49,14 +51,30 @@
 	background-color: var(--tertiary);
 }
 
+#controlPanel button:focus-visible,
+#controlPanel a:focus-visible {
+	outline: 2px solid var(--color);
+	outline-offset: 2px;
+}
+
+/* Theme picker */
+#theme {
+	position: relative;
+	display: flex;
+}
+
 #themeList {
 	border-radius: 12px;
 	background-color: var(--secondary);
 	box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.3);
 	position: absolute;
 	bottom: 60px;
-	left: 50%;
-	transform: translateX(-50%);
+	left: 0;
+	min-width: 200px;
+	max-height: min(60vh, 420px);
+	overflow-y: auto;
+	overscroll-behavior: contain;
+	scrollbar-width: thin;
 	padding: 8px;
 	cursor: default;
 }
@@ -68,11 +86,28 @@
 	color: var(--text);
 	padding: 8px;
 	width: 100%;
-	text-transform: capitalize;
+	justify-content: flex-start;
+	gap: 12px;
+	white-space: nowrap;
 	font-size: 16px;
 	text-align: left;
 	border-radius: 8px;
 }
 #themeList button:hover {
 	background-color: var(--tertiary);
+}
+#themeList button[aria-pressed='true'] {
+	background-color: var(--tertiary-disabled);
+	font-weight: 600;
+}
+
+/* Preview circle: background, surface and accent colors of the theme.
+   The data-theme attribute on the element supplies the variables. */
+.themePreview {
+	flex: none;
+	width: 22px;
+	height: 22px;
+	border-radius: 50%;
+	background: linear-gradient(135deg, var(--primary) 0 40%, var(--tertiary) 40% 60%, var(--color) 60% 100%);
+	box-shadow: 0 0 0 1px rgba(127, 127, 127, 0.5);
 }

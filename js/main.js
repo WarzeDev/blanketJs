@@ -29,9 +29,11 @@ const playbackButton = document.getElementById('playback');
 
 playbackButton.addEventListener('click', clickPlayback);
 window.addEventListener('keydown', (event) => {
-	if (event.key === ' ') {
-		clickPlayback();
-	}
+	if (event.key !== ' ') return;
+	// Don't hijack the space bar while typing (e.g. in the add sound dialog),
+	// or twice on the playback button which already handles it natively
+	if (event.target.closest('input, textarea, select, dialog, #playback')) return;
+	clickPlayback();
 });
 
 function clickPlayback() {

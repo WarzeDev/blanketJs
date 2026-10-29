@@ -1,14 +1,28 @@
 class Sound {
-	constructor(soundName) {
-		const fileName = soundName.toLowerCase().replace(/ /g, '');
+	/**
+	 * @param {string} soundName Display name
+	 * @param {object} [options]
+	 * @param {{id: string, blob: Blob}} [options.custom] Set for user-added sounds
+	 * @param {(sound: Sound) => void} [options.onRemove] Called when the remove button of a custom sound is clicked
+	 */
+	constructor(soundName, { custom = null, onRemove = null } = {}) {
+		const fileName = custom ? `custom-${custom.id}` : soundName.toLowerCase().replace(/ /g, '');
 
+		this.customId = custom ? custom.id : null;
+		this.objectUrl = null;
 		this.key = `blanket-${fileName}-volume`;
 
 		this.element = document.createElement('div');
 		this.element.classList.add('sound');
 		this.element.dataset.sound = fileName;
 
-		this.sound = new Audio(`assets/sounds/${fileName}.ogg`);
+		if (custom) {
+			this.element.classList.add('custom');
+			this.objectUrl = URL.createObjectURL(custom.blob);
+			this.sound = new Audio(this.objectUrl);
+		} else {
+			this.sound = new Audio(`assets/sounds/${fileName}.ogg`);
+		}
 		this.sound.preload = 'auto';
 		this.sound.load();
 		this.sound.loop = true;
@@ -20,12 +34,13 @@ class Sound {
 
 		this.icon = new Image();
 		this.icon.classList.add('icon');
-		this.icon.src = `assets/icons/${fileName}.svg`;
+		this.icon.src = `assets/icons/${custom ? 'noise' : fileName}.svg`;
 		this.iconContainer.appendChild(this.icon);
 
 		this.text = document.createElement('p');
 		this.text.classList.add('name');
 		this.text.textContent = soundName;
+		this.text.title = soundName;
 
 		this.sliderContainer = document.createElement('div');
 		this.sliderContainer.classList.add('volumeContainer');
@@ -39,6 +54,21 @@ class Sound {
 		this.element.appendChild(this.iconContainer);
 		this.element.appendChild(this.text);
 		this.element.appendChild(this.sliderContainer);
+
+		// Remove button (custom sounds only)
+		if (custom) {
+			this.removeButton = document.createElement('button');
+			this.removeButton.type = 'button';
+			this.removeButton.classList.add('removeSound');
+			this.removeButton.title = `Remove ${soundName}`;
+			this.removeButton.setAttribute('aria-label', `Remove ${soundName}`);
+			this.removeButton.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>';
+			this.removeButton.addEventListener('click', (event) => {
+				event.stopPropagation();
+				if (onRemove) onRemove(this);
+			});
+			this.element.appendChild(this.removeButton);
+		}
 
 		// Slider events
 		this.sliderContainer.addEventListener('mousedown', (event) => {
@@ -104,5 +134,17 @@ class Sound {
 			this.play();
 			this.element.classList.remove('paused');
 		}
+	}
+	// Fully removes a sound: stops playback, frees the file and forgets its volume
+	destroy() {
+		this.sound.pause();
+		this.sound.removeAttribute('src');
+		this.sound.load();
+		if (this.objectUrl) {
+			URL.revokeObjectURL(this.objectUrl);
+			this.objectUrl = null;
+		}
+		localStorage.removeItem(this.key);
+		this.element.remove();
 	}
 }
